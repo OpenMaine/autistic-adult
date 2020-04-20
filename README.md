@@ -1,2 +1,2 @@
-# adult-autism
+# autistic-adult
 Resources for adults with autism
