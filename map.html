@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Resources found for adults with autistic spectrum disorder in Maine</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Resources for adults with autistic syndrome disorder in Maine">
+    <meta name="author" content="Scott C. MacCallum">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="vendor/select2/css/select2.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="css/map.css" rel="stylesheet">
+    <link href="css/shared.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+	  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+	    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+  </head>
+  <body>
+    <div class="border-right shadow-lg toggled sidebar-toggleable margin-transition" id="sidebar-wrapper">
+      <div class="sidebar-toggleable toggled" id="sidebar-heading"></div>
+      <div id="map-list-wrapper">
+	<div id="map-result-spacer"></div>
+	<div id="map-results-list"></div>
+      </div>
+    </div>
+    <div class="d-flex" id="wrapper">
+      <div class="toggled sidebar-toggleable margin-transition hidden-lg">&nbsp;</div>
+      <div id="page-content-wrapper">
+	<span id="nav-desktop"></span>
+	<div class="main-content">
+	  <div class="card main-card">
+	    <div class="card-body filter-card">
+	      <div class="row ">
+		<div class="col-12">
+		  <h1 class="header-dark">Resources found for adults with ASD in ME</h1>
+		</div>
+		<span class="col-12" id="filters-desktop"></span>
+	      </div>
+	    </div>
+	    <div id="main-map"></div>
+	  </div>
+	</div>
+	<span id="filters-mobile" class="toggled"></span>
+	<span id="nav-mobile" ></span>
+      </div>
+    </div>
+    <script id="list-result-template" type="text/x-handlebars-template">
+      <div class="container-fluid">
+	{{#arr_empty this}}
+	<div class="row result-list-row">
+	  <div class="no-results-container">
+	    <div class="no-results-message p-2">No results found</div>
+	    <i class="material-icons no-result-icon" title="No results found">cloud_off</i>
+	    <div class="no-results-message p-2">Please select new filters and try again</div>
+	  </div>
+	</div>
+	{{/arr_empty}}
+	{{#each this}}
+	<div class="row pt-3 pb-3 result-list-item-container">
+	  <div class="row result-list-item-row">
+	    <div class="col-2 result-row-icon">
+	      <img src={{IconUrl}}  alt="{{Category}} icon" title="{{Category}}" />
+	    </div>
+	    <div class="col-10 pl-0">
+	      {{#if WebLink}}
+	      <a href="{{WebLink}}" title="{{WebLink}}" target="_blank" rel="noopener">{{Name}}</a>
+	      {{else}}
+	      <div>{{Name}}</div>
+	      {{/if}}
+	      <div class="small">
+		{{Category}}
+		<span class="text-muted small ml-1">{{Phone}}</span>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="row result-list-item-row">
+	    <div class="col-12 small">
+	      <strong>Address: </strong>
+	      {{Address}}
+	    </div>
+	    <div class="col-12 small mt-1">
+	      {{#if SpecialHoursOfOperation}}
+	      <strong>Covid-19 Hours: </strong>
+	      {{SpecialHoursOfOperation}}
+	      {{else}}
+	      <strong>Hours: </strong>
+	      {{HoursOfOperation}}
+	      {{/if}}
+	    </div>
+	    <div class="col-12 small mt-1">
+	      {{#if SpecialNotes}}
+	      <strong>Covid-19 Notes: </strong>
+	      {{SpecialNotes}}
+	      {{/if}}
+	    </div>
+	    <div class="col-12 small mt-1">
+	      {{#if OperationalNotes}}
+	      <strong>Notes: </strong>
+	      {{OperationalNotes}}
+	      {{/if}}
+	    </div>
+	    <div class="col-12 small mt-1">
+	      {{#if WebLink}}
+	      <strong>Website: </strong>
+	      <a href="{{WebLink}}" title="{{WebLink}}" target="_blank" rel="noopener">
+		{{WebLink}}</a>
+	      {{/if}}
+	    </div>
+	    <div class="col-12 small mt-1">
+	      {{#if WebLink2}}
+	      <strong>Website 2: </strong>
+	      <a href="{{WebLink2}}" title="{{WebLink2}}" target="_blank" rel="noopener">{{WebLink2}}</a>
+	      {{/if}}
+	    </div>
+	  </div>
+	</div>
+	{{/each}}
+	<div class="row">&nbsp;</div>
+      </div>
+    </script>
+    <script id="navbar-template" type="text/x-handlebars-template">
+      <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
+	<div class="navbar-header text-light hidden-sm">Maine Food Map</div>
+	<div>
+	  <button class="btn btn-primary menu-button" id="home-button" aria-label="Go to Maine Food Map homepage">
+	    <i class="material-icons toggle-icon" title="Home">home</i><br>
+	    <div class="toggle-label">home</div>
+	  </button>
+	  <button class="btn btn-primary menu-button" id="filters-toggle" aria-label="View filters">
+	    <i class="material-icons toggle-icon" title="Toggle filters">tune</i><br>
+	    <div class="toggle-label">filter</div>
+	  </button>
+	  <button class="btn btn-primary menu-button" id="list-toggle" aria-label="Toggle list view">
+	    <i class="material-icons toggle-icon" title="Toggle list view">compare_arrows</i>
+	    <div class="toggle-label">list</div>
+	  </button>
+	</div>
+	<div class="navbar-header text-light hidden-lg">Maine Food Map</div>
+      </nav>
+    </script>
+    <script id="filters-template" type="text/x-handlebars-template">
+      <div class="container-fluid">
+	<form id="zip-search-form" class="row mb-4 d-flex align-items-center">
+	  <div class="col-md-3 col-sm-5 col-8">
+	    <label class="top-label" for="zipcode-input">Zip Code</label>
+	    <input name="zipcode-input" id="zipcode-input"
+		   required pattern="^([0-9]{5})\s*[-]?\s*([0-9]{4})?\s*$"
+		   minlength="5" maxlength="10"
+		   class="form-control"
+		   type="text"
+		   placeholder="Use format 12345">
+	    <small class="text-muted">Clears county and town filters</small>
+	  </div>
+	  <div class="col-md-2 col-sm-3 col-4">
+	    <button type="button" class="btn btn-secondary" id="locate-me" title="Use my location">
+	      <i class="material-icons" title="Use my location">location_searching</i>
+	      <div class="toggle-label">locate me</div>
+	    </button>
+	  </div>
+	  <div class="col-md-2 col-sm-4 col-6">
+	    <label class="top-label" for="radius-select">Radius (miles)</label>
+	    <select class="custom-select form-control select-default" id="radius-select" aria-describedby="hero-radius-help" required>
+	      <option value=10>10</option>
+	      <option value=20>20</option>
+	      <option value=30>30</option>
+	      <option value=50>50</option>
+	    </select>
+	    <small class="text-muted">&nbsp;</small>
+	  </div>
+	  <div class="col-md-3 col-sm-12 col-6" id="zip-search-button-container">
+	    <button id="zip-search" type="submit" title="Search by zip code" class="btn btn-primary btn-block">Seach Zip Code</button>
+	  </div>
+	</form>
+	<div class="row">
+	  <div class="col-md-5 col-sm-12 col-12">
+	    <label class="top-label" for="category-select">Category</label>
+	    <select class="custom-select select-default my-1 mr-sm-2"
+		    id="category-select"
+		    name="category-select[]"
+		    multiple="multiple">
+	    </select>
+	  </div>
+	  <div class="col-md-3 col-6">
+	    <label class="top-label" for="county-select">County</label>
+	    <select class="custom-select select-default my-1 mr-sm-2" id="county-select">
+	    </select>
+	  </div>
+	  <div class="col-md-4 col-6">
+	    <label class="top-label" for="town-select">Town</label>
+	    <select class="custom-select select-default my-1 mr-sm-2" id="town-select">
+	    </select>
+	  </div>
+	</div>
+      </div>
+    </script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script src="vendor/select2/js/select2.min.js"></script>
+    <script src="js/core/util.js"></script>
+    <script src="js/core/mappingCore.js"></script>
+    <script src="js/core/defaultMap.js"></script>
+    <script src="js/core/geocoder.js"></script>
+    <script src="js/core/deviceLocationProvider.js"></script>
+    <script src="js/map/foodResource.js"></script>
+    <script src="js/map/pantryMapController.js"></script>
+    <script src="js/map/domEventHandlers.js"></script>
+    <script src="js/handlebarsHelpers.js"></script>
+    <script>
+      $(async function() {
+      /** service settings */
+      const baseUri = "https://sheetsapi.azurewebsites.net/Sheets.php";
+      const sheetId = "1H9utiRTBZrGreyqSB6oGL1BiVMi7UnM3JOx1HiMWEkc";
+      const sheetName = "QueryData";
+      const sheetRange = "A:S";
+      /** End service settings */
+      const defaultLocation = await new DeviceLocationProvider().getLocation();
+      const zoomLevel = defaultLocation ? 12 : 7;
+      const serviceUri = `${baseUri}?sheetId=${sheetId}&sheetName=${sheetName}&sheetRange=${sheetRange}`;
+      const startGeopoint = defaultLocation ? new GeoPoint(defaultLocation.latitude, defaultLocation.longitude) : new GeoPoint(45.1690993, -69.2568189);
+      const map = new DefaultMap('main-map', startGeopoint, zoomLevel);
+      const pantryMapper = new PantryMapController(serviceUri, map);
+      const domEventHandlers = new DomEventHandlers(pantryMapper);
+      domEventHandlers.init();
+      //callback for after first data fetch completes
+      pantryMapper.start(() => {
+      domEventHandlers.setFilterOptions();
+      let filterApplied = false;
+      const queryParams = Util.getQueryParams();
+      if (queryParams.zipCode && queryParams.zipCode.length > 0) {
+      $("#zipcode-input").val(queryParams.zipCode);
+      if (queryParams.radius && queryParams.radius.length > 0) {
+      $("#radius-select").val(queryParams.radius);
+      } else {
+      $("#radius-select").val(10);
+      }
+      $("#zip-search-form").submit();
+      filterApplied = true;
+      } else {
+      if (queryParams.town && queryParams.town.length > 0) {
+      $("#town-select").val(queryParams.town).trigger('change');
+      filterApplied = true;
+      }
+      if (queryParams.county && queryParams.county.length > 0) {
+      $("#county-select").val(queryParams.county).trigger('change');
+      filterApplied = true;
+      }
+      }
+      if (queryParams.category && queryParams.category.length > 0) {
+      $("#category-select").val(queryParams.category).trigger('change');
+      filterApplied = true;
+      }
+      if (!filterApplied) {
+      $("#category-select").val([...new Set(pantryMapper.data.map(d => d.Category))]).trigger('change');
+      map.setPosition(startGeopoint, zoomLevel);
+      }
+      });
+      });
+    </script>
+  </body>
+</html>
